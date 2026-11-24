@@ -31,8 +31,8 @@ def main():
 
 
     print("--------------------Q1--------------------")
-    num_of_alleles = 22
-    total_alleles = 32
+    num_of_alleles = 2200
+    total_alleles = 3200
     frequency_of_f =calculate_allele_frequency(num_of_alleles, total_alleles)
     variance = calculate_variance(frequency_of_f, total_alleles)
     find_confidence_intervals(frequency_of_f, variance)

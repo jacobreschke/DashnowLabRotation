@@ -1,4 +1,4 @@
-from Python.populationGeneticsBook.chapter1.questions.population_genetics import PopulationGenetics
+from Python.populationGeneticsBook.chapter1.questions.PopulationGenetics import PopulationGenetics
 
 MM = 298
 MN = 489

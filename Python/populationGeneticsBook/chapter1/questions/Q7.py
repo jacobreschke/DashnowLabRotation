@@ -1,4 +1,4 @@
-from population_genetics import PopulationGenetics
+from PopulationGenetics import PopulationGenetics
 
 
 SS = 99

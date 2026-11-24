@@ -1,32 +1,43 @@
-
 import numpy as np
 from scipy.stats import chi2
 
+
 class PopulationGenetics:
 
-    def __init__(self, p):
-        # Allele frequencies
-        self.p = p
-        self.q = 1 - p
+    def __init__(self, alleles, n):
+        self.alleles = alleles
+        self.n = n
+        self.genotypes = {}
 
-    # Calculate allele frequency from counts
     @staticmethod
-    def allele_frequency(allele_count, total_alleles):
-        return allele_count / total_alleles
+    def estimate_homozygous_allele_frequency(allele_count, population_size):
+        R = allele_count / population_size
+        return np.sqrt(R)
 
-    # Hardy-Weinberg genotype frequencies
+
     def hardy_weinberg(self):
+        """
+        Finds the estimated genotype frequencies for dominant/recessive homozygous, and heterozygous
+        :return: P: Dominant Homozygous, Q: Heterozygous, P: Recessive Homozygous
+        """
         p = self.p
         q = self.q
 
-        P = p ** 2
-        Q = 2 * p * q
-        R = q ** 2
+        self.P = p ** 2
+        self.Q = 2 * p * q
+        self.R = q ** 2
 
-        return P, Q, R
+
+
+        return self.P, self.Q, self.R
 
     # Expected genotype counts
     def expected_counts(self, population_size):
+        """
+        Finds the estimated genotype counts for dominant/recessive homozygous, and heterozygous
+        :param population_size:
+        :return: P: Dominant Homozygous, Q: Heterozygous, P: Recessive Homozygous
+        """
         P, Q, R = self.hardy_weinberg()
 
         return (
@@ -118,3 +129,43 @@ class PopulationGenetics:
         deg_freedom = self.degrees_of_freedom(observed, estimated_parameters)
 
         return chi2.sf(statistic, deg_freedom)
+
+
+    def sampling_variance(self, population_size):
+        R = self.q ** 2
+        return (1 - R) / (4 * population_size)
+
+    def standard_error(self, population_size):
+        return np.sqrt(self.sampling_variance(population_size))
+
+    def heterozygous_among_dominant(self):
+        P, Q, R = self.hardy_weinberg()
+        return Q / (P + Q)
+
+
+    def get_heterozygous_to_recessive_ratio(self):
+        return self.Q / self.R
+
+    def get_heterozygous_to_dominant_ratio(self):
+        return self.Q / self.P
+
+    def run_results(self):
+        self.P, self.Q, self.R = self.hardy_weinberg()
+        self.get_heterozygous_to_recessive_ratio()
+        self.get_heterozygous_to_dominant_ratio()
+
+
+    def print_results(self):
+
+        print(f"Frequency of A: {self.p:.4f}")
+        print(f"Frequency of a: {self.q:.4f}")
+
+        print(f"\nAA: {self.P:.4f}")
+        print(f"Aa: {self.Q:.4f}")
+        print(f"aa: {self.R:.4f}")
+
+        print(f"\nHeterozygous among sample: "
+              f"{self.heterozygous_among_dominant():.2%}")
+
+        print(f"Standard error: {self.standard_error(self.n):.4f}")
+        print(f"Sampling variance: {self.sampling_variance(self.n):.6f}")
